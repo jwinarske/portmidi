@@ -372,10 +372,10 @@ public class PmDefaultsFrame extends JFrame
 	// load the logo from the jar file (on Linux and Windows)
 	ClassLoader cldr = this.getClass().getClassLoader();
         ImageIcon icon;
-        URL logoURL = cldr.getResource("portmusic_logo.png");
+        URL logoURL = cldr.getResource("pmdefaults/portmusic_logo.png");
         if (logoURL == null) {
             // on Mac, load from bundle
-            icon = new ImageIcon("portmusic_logo.png");
+            icon = new ImageIcon("pmdefaults/portmusic_logo.png");
         } else {
             icon = new ImageIcon(logoURL);
         }

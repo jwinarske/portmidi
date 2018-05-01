@@ -6,8 +6,10 @@ if(APPLE)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 endif(APPLE)
 
+
 if(WIN32)
 include(../pm_win/static.cmake)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif(WIN32)
 
 macro(make_a_test name)

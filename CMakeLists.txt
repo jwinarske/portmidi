@@ -2,7 +2,7 @@
 # Roger B. Dannenberg
 # 20 Sep 2009
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 
 if(UNIX)
   # allow user to set Release or Debug

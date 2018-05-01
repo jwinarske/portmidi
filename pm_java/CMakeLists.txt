@@ -1,47 +1,72 @@
 # pm_java
 
-if(UNIX)
-  if(APPLE)
-    # java not dealt with in CMake -- see pm_mac/pm_mac.xcodeproj
-  else(APPLE)
-    # linux
-    set(JPORTMIDICLASS JPortMidi.class JPortMidiException.class
-    		       JPortMidiApi.class)
-    set(PMDEFAULTSCLASS PmDefaultsFrame.class PmDefaults.class)
-    prepend_path(JPORTMIDICLASS2 jportmidi/ ${JPORTMIDICLASS})
-    prepend_path(PMDEFAULTSCLASS2 pmdefaults/ ${PMDEFAULTSCLASS})
-    set(PMDEFAULTS_ALL_CLASSES ${JPORTMIDICLASS2} ${PMDEFAULTSCLASS2})
-    # message(STATUS "PMDEFAULTS_ALL_CLASSES is " ${PMDEFAULTS_ALL_CLASSES})
-    add_custom_command(OUTPUT pmdefaults/PmDefaultsFrame.class
-        COMMAND javac -classpath . pmdefaults/PmDefaultsFrame.java
-	MAIN_DEPENDENCY pmdefaults/PmDefaultsFrame.java
-	DEPENDS pmdefaults/PmDefaults.java
-	WORKING_DIRECTORY .)
-    add_custom_command(OUTPUT pmdefaults/PmDefaults.class
-        COMMAND javac -classpath . pmdefaults/PmDefaults.java
-	MAIN_DEPENDENCY pmdefaults/PmDefaults.java
-	DEPENDS pmdefaults/PmDefaultsFrame.java
-	WORKING_DIRECTORY .)
-    add_custom_command(OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pmdefaults.jar
-        COMMAND	cp pmdefaults/portmusic_logo.png .
-        COMMAND	jar cmf pmdefaults/manifest.txt pmdefaults.jar
-		pmdefaults/*.class portmusic_logo.png jportmidi/*.class
-  	COMMAND chmod +x pmdefaults/pmdefaults
-	COMMAND cp pmdefaults/pmdefaults ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-	COMMAND mv pmdefaults.jar ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-	COMMAND rm portmusic_logo.png
-	MAIN_DEPENDENCY pmdefaults/PmDefaults.class
-	DEPENDS ${PMDEFAULTS_ALL_CLASSES}
-	WORKING_DIRECTORY .)
-    add_custom_target(pmdefaults_target ALL 
-        DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pmdefaults.jar)
-    # message(STATUS "add_custom_target: pmdefaults.jar")
+include(FindJava)
+include(FindJNI)
+include(UseJava)
 
-    # install the libraries (Linux only)
-    INSTALL(FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pmdefaults.jar
-      DESTINATION /usr/share/java)
-    INSTALL(PROGRAMS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pmdefaults
-      DESTINATION /usr/local/bin)
-  endif(APPLE)
+
+if(JAVA_FOUND)
+
+    set(CMAKE_JAVA_COMPILE_FLAGS -Xlint)
+
+    set(JAVA_SOURCE_FILES
+        jportmidi/JPortMidi.java
+        jportmidi/JPortMidiException.java
+        jportmidi/JPortMidiApi.java
+        pmdefaults/PmDefaultsFrame.java
+        pmdefaults/PmDefaults.java
+        pmdefaults/portmusic_logo.png
+    )
+
+    set(CMAKE_JNI_TARGET TRUE)
+
+    add_jar(pmdefaults ${JAVA_SOURCE_FILES}
+        OUTPUT_NAME pmdefaults
+        OUTPUT_DIR libs
+        MANIFEST pmdefaults/manifest.txt
+        GENERATE_NATIVE_HEADERS pmdefaults_jni_header
+    )
+
+    install_jar(pmdefaults DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+
+endif(JAVA_FOUND)
+
+
+if(APPLE)
+
+    set(JAVAVM_LIB "${FRAMEWORK_PATH}/JavaVM.framework")
+    set(JAVA_INCLUDE_PATHS ${JAVAVM_LIB}/Headers)
+
+elseif(WIN32)
+
+    set(JAVA_INCLUDE_PATHS ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2})
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+else()
+
+    message(STATUS "JAVA_JVM_LIB_PATH is " ${JAVA_JVM_LIB_PATH})
+    message(STATUS "JAVA_INCLUDE_PATH is " ${JAVA_INCLUDE_PATH})
+    message(STATUS "JAVA_INCLUDE_PATH2 is " ${JAVA_INCLUDE_PATH2})
+    message(STATUS "JAVA_JVM_LIBRARY is " ${JAVA_JVM_LIBRARY})
+    set(JAVA_INCLUDE_PATHS ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2})
+    # libjvm.so is found relative to JAVA_INCLUDE_PATH:
+    set(JAVAVM_LIB ${JAVA_JVM_LIBRARY}/libjvm.so)
+
+endif()
+
+set(JNI_EXTRA_LIBS ${PM_NEEDED_LIBS} ${JAVA_JVM_LIBRARY})
+
+include_directories(${JAVA_INCLUDE_PATHS})
+add_library(pmjni SHARED ${LIBSRC} ../pm_java/pmjni/pmjni.c)
+target_link_libraries(pmjni pmdefaults_jni_header portmidi-static ${JNI_EXTRA_LIBS})
+
+add_dependencies(pmjni pmdefaults)
+add_dependencies(pmjni portmidi-static)
+
+
+# install the libraries (Linux and Mac OS X command line)
+if(UNIX)
+  INSTALL(TARGETS pmjni
+    LIBRARY DESTINATION /usr/local/lib
+    ARCHIVE DESTINATION /usr/local/lib)
 endif(UNIX)
-# In windows, use pm_java/make.bat
