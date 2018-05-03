@@ -22,12 +22,12 @@ if(JAVA_FOUND)
 
     add_jar(pmdefaults ${JAVA_SOURCE_FILES}
         OUTPUT_NAME pmdefaults
-        OUTPUT_DIR libs
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/java
         MANIFEST pmdefaults/manifest.txt
-        GENERATE_NATIVE_HEADERS pmdefaults_jni_header
+        GENERATE_NATIVE_HEADERS #pmdefaults_jni_header
     )
 
-    install_jar(pmdefaults DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+    install_jar(pmdefaults DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 endif(JAVA_FOUND)
 
@@ -67,6 +67,6 @@ add_dependencies(pmjni portmidi-static)
 # install the libraries (Linux and Mac OS X command line)
 if(UNIX)
   INSTALL(TARGETS pmjni
-    LIBRARY DESTINATION /usr/local/lib
-    ARCHIVE DESTINATION /usr/local/lib)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif(UNIX)

@@ -23,6 +23,8 @@ import java.net.*;
 public class PmDefaultsFrame extends JFrame 
         implements ActionListener, ComponentListener {
 
+    private static final long serialVersionUID = 202020L;
+
     // This class extends JPortMidi in order to override midi input handling
     // In this case, midi input simply blinks the activity light
     public class JPM extends JPortMidi {
@@ -72,6 +74,8 @@ public class PmDefaultsFrame extends JFrame
     }
 
     public class ActivityLight extends JPanel {
+        private static final long serialVersionUID = 303030L;
+
         Color color;
         final Color OFF_COLOR = Color.BLACK;
         final Color ON_COLOR = Color.GREEN;
@@ -103,13 +107,13 @@ public class PmDefaultsFrame extends JFrame
     }
 
     private JLabel inputLabel;
-    private JComboBox inputSelection;
+    private JComboBox<String> inputSelection;
     // inputIds maps from the index of an item in inputSelection to the
     // device ID. Used to open the selected device.
     private ArrayList<Integer> inputIds;
     private ActivityLight inputActivity;
     private JLabel outputLabel;
-    private JComboBox outputSelection;
+    private JComboBox<String> outputSelection;
     // analogous to inputIds, outputIds maps selection index to device ID
     private ArrayList<Integer> outputIds;
     private JButton testButton;
@@ -173,7 +177,7 @@ public class PmDefaultsFrame extends JFrame
     void openInputSelection() {
         int id = inputSelection.getSelectedIndex();
         if (id < 0) return; // nothing selected
-        id = (Integer) (inputIds.get(id)); // map to device ID
+        id = inputIds.get(id); // map to device ID
         // openInput will close any previously open input stream
         try {
             jpm.openInput(id, 100); // buffer size hopes to avoid overflow
@@ -326,7 +330,7 @@ public class PmDefaultsFrame extends JFrame
         inputLabel.setText("Default Input");
         wholePanel.add(inputLabel);
 
-        inputSelection = new JComboBox();
+        inputSelection = new JComboBox<>();
         inputSelection.addActionListener(this);
         inputSelection.setLocation(20, 30);
         inputSelection.setSize(inputSelection.getPreferredSize());
@@ -341,7 +345,7 @@ public class PmDefaultsFrame extends JFrame
         outputLabel.setText("Default Output");
         wholePanel.add(outputLabel);
 
-        outputSelection = new JComboBox();
+        outputSelection = new JComboBox<>();
         outputSelection.addActionListener(this);
         wholePanel.add(outputSelection);
         testButton = new JButton();
@@ -414,7 +418,7 @@ public class PmDefaultsFrame extends JFrame
             if (!jpm.isOpenOutput()) {
                 int id = outputSelection.getSelectedIndex();
                 if (id < 0) return; // nothing selected
-                id = (Integer) (outputIds.get(id));
+                id = outputIds.get(id);
                 System.out.println("calling openOutput");
                 jpm.openOutput(id, 10, 10);
             }

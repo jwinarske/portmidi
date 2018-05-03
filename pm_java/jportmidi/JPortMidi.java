@@ -54,7 +54,7 @@ public class JPortMidi {
             pm = new JPortMidiApi();
             pmRefCount++;
             System.out.println("Calling Pm_Initialize");
-            checkError(pm.Pm_Initialize());
+            checkError(JPortMidiApi.Pm_Initialize());
             System.out.println("Called Pm_Initialize");
         }
         buffer = new PmEvent();
@@ -77,25 +77,25 @@ public class JPortMidi {
             throw new JPortMidiException(pmStreamOpen,
                     "RefreshDeviceLists called while stream is open");
         }
-        checkError(pm.Pm_Terminate());
-        checkError(pm.Pm_Initialize());
+        checkError(JPortMidiApi.Pm_Terminate());
+        checkError(JPortMidiApi.Pm_Initialize());
     }
 
     // there is no control over when/whether this is called, but it seems
     // to be a good idea to close things when this object is collected
     public void finalize() {
         if (input != null) {
-            error = pm.Pm_Close(input);
+            error = JPortMidiApi.Pm_Close(input);
         }
         if (input != null) {
-            int rslt = pm.Pm_Close(output);
+            int rslt = JPortMidiApi.Pm_Close(output);
             // we may lose an error code from closing output, but don't
             // lose any real error from closing input...
             if (error == pm.pmNoError) error = rslt;
         }
         pmRefCount--;
         if (pmRefCount == 0) {
-            error = pm.Pm_Terminate();
+            error = JPortMidiApi.Pm_Terminate();
         }
     }
 
@@ -105,58 +105,58 @@ public class JPortMidi {
         // which are not errors, so compare with >=
         if (err >= pm.pmNoError) return err;
         if (err == pm.pmHostError) {
-            throw new JPortMidiException(err, pm.Pm_GetHostErrorText());
+            throw new JPortMidiException(err, JPortMidiApi.Pm_GetHostErrorText());
         } else {
-            throw new JPortMidiException(err, pm.Pm_GetErrorText(err));
+            throw new JPortMidiException(err, JPortMidiApi.Pm_GetErrorText(err));
         }
     }
 
     // ******** ACCESS TO TIME ***********
     
     public void timeStart(int resolution) throws JPortMidiException {
-        checkError(pm.Pt_TimeStart(resolution));
+        checkError(JPortMidiApi.Pt_TimeStart(resolution));
     }
         
     public void timeStop() throws JPortMidiException {
-        checkError(pm.Pt_TimeStop());
+        checkError(JPortMidiApi.Pt_TimeStop());
     }
         
     public int timeGet() {
-        return pm.Pt_Time();
+        return JPortMidiApi.Pt_Time();
     }
         
     public boolean timeStarted() {
-        return pm.Pt_TimeStarted();
+        return JPortMidiApi.Pt_TimeStarted();
     }
 
     // ******* QUERY DEVICE INFORMATION *********
         
     public int countDevices() throws JPortMidiException {
-        return checkError(pm.Pm_CountDevices());
+        return checkError(JPortMidiApi.Pm_CountDevices());
     }
 
     public int getDefaultInputDeviceID()  throws JPortMidiException {
-        return checkError(pm.Pm_GetDefaultInputDeviceID());
+        return checkError(JPortMidiApi.Pm_GetDefaultInputDeviceID());
     }
 
     public int getDefaultOutputDeviceID() throws JPortMidiException {
-        return checkError(pm.Pm_GetDefaultOutputDeviceID());
+        return checkError(JPortMidiApi.Pm_GetDefaultOutputDeviceID());
     }
 
     public String getDeviceInterf(int i) {
-        return pm.Pm_GetDeviceInterf(i);
+        return JPortMidiApi.Pm_GetDeviceInterf(i);
     }
 
     public String getDeviceName(int i) {
-        return pm.Pm_GetDeviceName(i);
+        return JPortMidiApi.Pm_GetDeviceName(i);
     }
 
     public boolean getDeviceInput(int i) {
-        return pm.Pm_GetDeviceInput(i);
+        return JPortMidiApi.Pm_GetDeviceInput(i);
     }
 
     public boolean getDeviceOutput(int i) {
-        return pm.Pm_GetDeviceOutput(i);
+        return JPortMidiApi.Pm_GetDeviceOutput(i);
     }
 
     // ********** MIDI INTERFACE ************
@@ -174,12 +174,12 @@ public class JPortMidi {
     public void openInput(int inputDevice, String inputDriverInfo, int bufferSize) 
             throws JPortMidiException
     {
-        if (isOpenInput()) pm.Pm_Close(input);
+        if (isOpenInput()) JPortMidiApi.Pm_Close(input);
         else input = new PortMidiStream();
         if (trace) {
             System.out.println("openInput " + getDeviceName(inputDevice));
         }
-        checkError(pm.Pm_OpenInput(input, inputDevice, 
+        checkError(JPortMidiApi.Pm_OpenInput(input, inputDevice, 
                                    inputDriverInfo, bufferSize));
         // if no exception, then increase count of open streams
         openCount++;
@@ -197,12 +197,12 @@ public class JPortMidi {
 
     public void openOutput(int outputDevice, String outputDriverInfo,
             int bufferSize, int latency) throws JPortMidiException {
-        if (isOpenOutput()) pm.Pm_Close(output);
+        if (isOpenOutput()) JPortMidiApi.Pm_Close(output);
         else output = new PortMidiStream();
         if (trace) {
             System.out.println("openOutput " + getDeviceName(outputDevice));
         }
-        checkError(pm.Pm_OpenOutput(output, outputDevice, outputDriverInfo, 
+        checkError(JPortMidiApi.Pm_OpenOutput(output, outputDevice, outputDriverInfo, 
                                     bufferSize, latency));
         // if no exception, then increase count of open streams
         openCount++;
@@ -210,17 +210,17 @@ public class JPortMidi {
 
     public void setFilter(int filters) throws JPortMidiException {
         if (input == null) return; // no effect if input not open
-        checkError(pm.Pm_SetFilter(input, filters));
+        checkError(JPortMidiApi.Pm_SetFilter(input, filters));
     }
 
     public void setChannelMask(int mask) throws JPortMidiException {
         if (input == null) return; // no effect if input not open
-        checkError(pm.Pm_SetChannelMask(input, mask));
+        checkError(JPortMidiApi.Pm_SetChannelMask(input, mask));
     }
 
     public void abort() throws JPortMidiException {
         if (output == null) return; // no effect if output not open
-        checkError(pm.Pm_Abort(output));
+        checkError(JPortMidiApi.Pm_Abort(output));
     }
 
     // In keeping with the idea that this class represents an input and output,
@@ -228,14 +228,14 @@ public class JPortMidi {
     // the need for clients to ever deal directly with a stream object
     public void closeInput() throws JPortMidiException {
         if (input == null) return; // no effect if input not open
-        checkError(pm.Pm_Close(input));
+        checkError(JPortMidiApi.Pm_Close(input));
         input = null;
         openCount--;
     }
 
     public void closeOutput() throws JPortMidiException {
         if (output == null) return; // no effect if output not open
-        checkError(pm.Pm_Close(output));
+        checkError(JPortMidiApi.Pm_Close(output));
         output = null;
         openCount--;
     }
@@ -244,7 +244,7 @@ public class JPortMidi {
     public void poll() throws JPortMidiException {
         if (input == null) return; // does nothing until input is opened
         while (true) {
-            int rslt = pm.Pm_Read(input, buffer);
+            int rslt = JPortMidiApi.Pm_Read(input, buffer);
             checkError(rslt);
             if (rslt == 0) return; // no more messages
             handleMidiIn(buffer);
@@ -258,7 +258,7 @@ public class JPortMidi {
         if (trace) {
             System.out.println("writeShort: " + Integer.toHexString(msg));
         }
-        checkError(pm.Pm_WriteShort(output, when, msg));
+        checkError(JPortMidiApi.Pm_WriteShort(output, when, msg));
     }
 
     public void writeSysEx(int when, byte msg[]) throws JPortMidiException {
@@ -272,7 +272,7 @@ public class JPortMidi {
             }
             System.out.print("\n");
         }
-        checkError(pm.Pm_WriteSysEx(output, when, msg));
+        checkError(JPortMidiApi.Pm_WriteSysEx(output, when, msg));
     }
     
     public int midiChanMessage(int chan, int status, int data1, int data2) {
@@ -484,7 +484,7 @@ public class JPortMidi {
         case 0xF0:
             switch (channel) {
             case 0: sysexBegin(buffer.message); break;
-            case 1: mtcQuarterFrame(data1);
+            case 1: mtcQuarterFrame(data1); break;
             case 2: songPosition(data1 + (data2 << 7)); break;
             case 3: songSelect(data1); break;
             case 4: /* unused */ break;
