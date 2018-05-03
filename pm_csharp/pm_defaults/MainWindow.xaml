@@ -1,0 +1,22 @@
+﻿<Window x:Class="pmdefaults.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:pmdefaults"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="284.934" Width="709.607" ResizeMode="NoResize">
+    <Grid HorizontalAlignment="Left" Width="702" Height="269" VerticalAlignment="Top">
+        <Label x:Name="inputLabel" Content="Default Input" HorizontalAlignment="Left" Margin="29,28,0,0" VerticalAlignment="Top" Width="103"/>
+        <ComboBox x:Name="inputSelection" HorizontalAlignment="Left" Margin="161,28,0,0" VerticalAlignment="Top" Width="417" Height="26" SelectionChanged="onInputSelection"/>
+        <Label x:Name="outputLabel" Content="Default Output" HorizontalAlignment="Left" Margin="29,75,0,0" VerticalAlignment="Top" Width="103"/>
+        <ComboBox x:Name="outputSelection" HorizontalAlignment="Left" Margin="161,75,0,0" VerticalAlignment="Top" Width="417" Height="26" SelectionChanged="onOutputSelection"/>
+        <Button x:Name="testButton" Content="Test" HorizontalAlignment="Left" Margin="595,75,0,0" VerticalAlignment="Top" Width="75" Height="26" Click="onTestButton"/>
+        <Button x:Name="refreshButton" Content="Refresh Device Lists" HorizontalAlignment="Left" Margin="29,142,0,0" VerticalAlignment="Top" Width="190" Height="30" Click="onRefreshButton"/>
+        <Button x:Name="updateButton" Content="Update Preferences" HorizontalAlignment="Left" Margin="256,142,0,0" VerticalAlignment="Top" Width="190" Height="30" Click="onUpdateButton"/>
+        <Button x:Name="closeButton" Content="Close/Release Ports" HorizontalAlignment="Left" Margin="480,142,0,0" VerticalAlignment="Top" Width="190" Height="30" Click="onCloseButton"/>
+        <Image x:Name="logo" HorizontalAlignment="Left" Height="33" Margin="304,197,0,0" VerticalAlignment="Top" Width="93" Source="C:\cygwin64\home\joel\git\portmidi\pm_java\pmdefaults\portmusic_logo.png" Stretch="None"/>
+        <Ellipse x:Name="inputActivity" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="26" Margin="595,28,0,0" Stroke="Black" VerticalAlignment="Top" Width="26" RenderTransformOrigin="1.007,0.677"/>
+
+    </Grid>
+</Window>

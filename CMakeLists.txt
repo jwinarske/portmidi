@@ -29,3 +29,6 @@ add_subdirectory(pm_dylib)
 
 add_subdirectory(pm_java)
 
+if(MSVC)
+add_subdirectory(pm_csharp/pm_defaults)
+endif(MSVC)
