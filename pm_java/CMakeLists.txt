@@ -24,7 +24,7 @@ if(JAVA_FOUND)
         OUTPUT_NAME pmdefaults
         OUTPUT_DIR ${CMAKE_BINARY_DIR}/java
         MANIFEST pmdefaults/manifest.txt
-        GENERATE_NATIVE_HEADERS #pmdefaults_jni_header
+        GENERATE_NATIVE_HEADERS pmdefaults_jni_header
     )
 
     install_jar(pmdefaults DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

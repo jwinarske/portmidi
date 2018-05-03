@@ -89,16 +89,14 @@ endif(UNIX)
 list(APPEND LIBSRC pmutil portmidi)
 
 # now add the shared files to make the complete list of library sources
-add_library(portmidi-static ${LIBSRC})
+add_library(portmidi-static STATIC ${LIBSRC})
 set_target_properties(portmidi-static PROPERTIES OUTPUT_NAME "portmidi_s")
 target_link_libraries(portmidi-static ${PM_NEEDED_LIBS})
+
 
 # install the libraries (Linux and Mac OS X command line)
 if(UNIX)
   INSTALL(TARGETS portmidi-static
-    LIBRARY DESTINATION /usr/local/lib
-    ARCHIVE DESTINATION /usr/local/lib)
-# .h files installed by pm_dylib/CMakeLists.txt, so don't need them here
-#  INSTALL(FILES portmidi.h ../porttime/porttime.h
-#    DESTINATION /usr/local/include)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif(UNIX)

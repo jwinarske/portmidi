@@ -18,7 +18,12 @@ macro(make_a_test name)
   add_dependencies(${name} portmidi-static)
 endmacro(make_a_test)
 
-make_a_test(test)
+# using the target name "test" is no longer allowed...
+add_executable(test_ test.c)
+target_link_libraries(test_ portmidi-static ${PM_NEEDED_LIBS})
+add_dependencies(test_ portmidi-static)
+set_target_properties(test_ PROPERTIES OUTPUT_NAME "test")
+
 make_a_test(midithread)
 make_a_test(midithru)
 make_a_test(sysex)
