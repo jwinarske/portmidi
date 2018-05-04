@@ -521,6 +521,7 @@ example: Read(50) returns all the events in the buffer,
          up to 50 events.
         """
         cdef PmEvent buffer[1024]
+        cdef int count
         
         self._check_open()
 
@@ -532,6 +533,7 @@ example: Read(50) returns all the events in the buffer,
         if NumEvents < 0: raise Exception, Pm_GetErrorText(NumEvents)
         x=[]
         if NumEvents >= 1:
-            for loop in range(NumEvents):
+            count = NumEvents
+            for loop in range(count):
                  x.append([[buffer[loop].message & 0xff, (buffer[loop].message >> 8) & 0xFF, (buffer[loop].message >> 16) & 0xFF, (buffer[loop].message >> 24) & 0xFF], buffer[loop].timestamp])
         return x
