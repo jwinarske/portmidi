@@ -56,7 +56,6 @@ void fast_test()
 {
     PmStream * midi;
 	char line[80];
-    PmEvent buffer[16];
 
     /* It is recommended to start timer before PortMidi */
     TIME_START;
@@ -135,10 +134,7 @@ int main(int argc, char *argv[])
 {
     int default_in;
     int default_out;
-    int i = 0, n = 0;
-    char line[STRING_MAX];
-    int test_input = 0, test_output = 0, test_both = 0, somethingStupid = 0;
-    int stream_test = 0;
+    int i = 0;
     int latency_valid = FALSE;
     int rate_valid = FALSE;
     int device_valid = FALSE;
