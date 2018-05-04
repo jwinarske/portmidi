@@ -66,6 +66,7 @@ if(UNIX)
     
   else(APPLE)
 
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(LINUXSRC pmlinuxalsa pmlinux finddefault)
     prepend_path(LIBSRC ../pm_linux/ ${LINUXSRC})
     list(APPEND LIBSRC ../porttime/ptlinux)

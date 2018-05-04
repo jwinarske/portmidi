@@ -18,16 +18,22 @@ if(JAVA_FOUND)
         pmdefaults/portmusic_logo.png
     )
 
-    set(CMAKE_JNI_TARGET TRUE)
+    if(NOT Java_VERSION_MINOR VERSION_LESS 1.8)
 
-    add_jar(pmdefaults ${JAVA_SOURCE_FILES}
-        OUTPUT_NAME pmdefaults
-        OUTPUT_DIR ${CMAKE_BINARY_DIR}/java
-        MANIFEST pmdefaults/manifest.txt
-        GENERATE_NATIVE_HEADERS pmdefaults_jni_header
+        add_jar(pmdefaults ${JAVA_SOURCE_FILES}
+            OUTPUT_NAME pmdefaults
+            MANIFEST pmdefaults/manifest.txt
+            GENERATE_NATIVE_HEADERS pmdefaults_jni_header 
+            DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/pmjni"
+        )
+
+    else()
+        MESSAGE(ERROR "JNI Header Creation not implemented for this JDK version yet...")
+    endif()
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pmdefaults.jar 
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib 
     )
-
-    install_jar(pmdefaults DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 endif(JAVA_FOUND)
 
@@ -56,15 +62,22 @@ endif()
 
 set(JNI_EXTRA_LIBS ${PM_NEEDED_LIBS} ${JAVA_JVM_LIBRARY})
 
-include_directories(${JAVA_INCLUDE_PATHS})
-add_library(pmjni SHARED ${LIBSRC} ../pm_java/pmjni/pmjni.c)
-target_link_libraries(pmjni pmdefaults_jni_header portmidi-static ${JNI_EXTRA_LIBS})
+include_directories(
+    ${JAVA_INCLUDE_PATHS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/pmjni/
+)
+set(PMJNI_SOURCE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/pmjni/pmjni.c
+)
 
+add_library(pmjni SHARED ${LIBSRC} ${PMJNI_SOURCE})
+target_link_libraries(pmjni portmidi-static ${JNI_EXTRA_LIBS})
+
+add_dependencies(pmjni pmdefaults_jni_header)
 add_dependencies(pmjni pmdefaults)
 add_dependencies(pmjni portmidi-static)
 
 
-# install the libraries (Linux and Mac OS X command line)
 if(UNIX)
   INSTALL(TARGETS pmjni
     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

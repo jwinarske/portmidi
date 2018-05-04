@@ -33,8 +33,9 @@
 
 /* to store client/port in the device descriptor */
 #define MAKE_DESCRIPTOR(client, port) ((void*)(((client) << 8) | (port)))
-#define GET_DESCRIPTOR_CLIENT(info) ((((int)(info)) >> 8) & 0xff)
-#define GET_DESCRIPTOR_PORT(info) (((int)(info)) & 0xff)
+#define GET_DESCRIPTOR_CLIENT(info) ((((uintptr_t)(info)) >> 8) & 0xff)
+#define GET_DESCRIPTOR_PORT(info) (((uintptr_t)(info)) & 0xff)
+
 
 #define BYTE unsigned char
 
@@ -53,7 +54,6 @@ typedef struct alsa_descriptor_struct {
     snd_midi_event_t *parser;
     int error; /* host error code */
 } alsa_descriptor_node, *alsa_descriptor_type;
-
 
 /* get_alsa_error_text -- copy error text to potentially short string */
 /**/
@@ -435,7 +435,7 @@ static PmError alsa_write_flush(PmInternal *midi, PmTimestamp timestamp)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
-    VERBOSE printf("snd_seq_drain_output: 0x%x\n", (unsigned int) seq);
+    VERBOSE printf("snd_seq_drain_output: 0x%p\n", seq);
     desc->error = snd_seq_drain_output(seq);
     if (desc->error < 0) return pmHostError;
 
@@ -753,22 +753,22 @@ PmError pm_linuxalsa_init( void )
             if (!(caps & (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE)))
                 continue; /* ignore if you cannot read or write port */
             if (caps & SND_SEQ_PORT_CAP_SUBS_WRITE) {
-                if (pm_default_output_device_id == -1) 
+                if (pm_default_output_device_id == -1)
                     pm_default_output_device_id = pm_descriptor_index;
                 pm_add_device("ALSA",
                               pm_strdup(snd_seq_port_info_get_name(pinfo)),
                               FALSE,
-                              MAKE_DESCRIPTOR(snd_seq_port_info_get_client(pinfo),
+                              MAKE_DESCRIPTOR((uintptr_t)snd_seq_port_info_get_client(pinfo),
                                               snd_seq_port_info_get_port(pinfo)),
                               &pm_linuxalsa_out_dictionary);
             }
             if (caps & SND_SEQ_PORT_CAP_SUBS_READ) {
-                if (pm_default_input_device_id == -1) 
+                if (pm_default_input_device_id == -1)
                     pm_default_input_device_id = pm_descriptor_index;
                 pm_add_device("ALSA",
                               pm_strdup(snd_seq_port_info_get_name(pinfo)),
                               TRUE,
-                              MAKE_DESCRIPTOR(snd_seq_port_info_get_client(pinfo),
+                              MAKE_DESCRIPTOR((uintptr_t)snd_seq_port_info_get_client(pinfo),
                                               snd_seq_port_info_get_port(pinfo)),
                               &pm_linuxalsa_in_dictionary);
             }
