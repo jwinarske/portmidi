@@ -18,7 +18,7 @@ if(APPLE OR WIN32)
     message(STATUS "DEFAULT_DEBUG_FLAGS not nil: " ${DEFAULT_DEBUG_FLAGS})
   endif(NOT DEFAULT_DEBUG_FLAGS)
 else(APPLE OR WIN32)
-  set(LINUX_FLAGS "-DPMALSA")
+  add_definitions(-DPMALSA)
 endif(APPLE OR WIN32)
 
 if(APPLE)
@@ -36,10 +36,10 @@ macro(prepend_path RESULT PATH)
 endmacro(prepend_path)
 
 set(CMAKE_C_FLAGS_DEBUG 
-    "${DEFAULT_DEBUG_FLAGS} -DPM_CHECK_ERRORS=1 -DDEBUG ${LINUX_FLAGS}"
+    "${DEFAULT_DEBUG_FLAGS} -DPM_CHECK_ERRORS=1 -DDEBUG"
     CACHE STRING "enable extra checks for debugging" FORCE)
 
-set(CMAKE_C_FLAGS_RELEASE "${DEFAULT_RELEASE_FLAGS} ${LINUX_FLAGS}"
+set(CMAKE_C_FLAGS_RELEASE "${DEFAULT_RELEASE_FLAGS}"
     CACHE STRING "flags for release version" FORCE)
 
 # first include the appropriate system-dependent file:

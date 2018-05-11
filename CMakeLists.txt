@@ -1,5 +1,4 @@
-
-cmake_minimum_required(VERSION 3.11.1)
+cmake_minimum_required(VERSION 3.10.0)
 
 # Clear out the built-in C++ compiler and link flags for each of the 
 # unused configurations.
