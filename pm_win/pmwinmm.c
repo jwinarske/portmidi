@@ -146,7 +146,7 @@ general MIDI device queries
 */
 static void pm_winmm_general_inputs()
 {
-    UINT i;
+	UINT_PTR i;
     WORD wRtn;
     midi_num_inputs = midiInGetNumDevs();
     midi_in_caps = (MIDIINCAPS *) pm_alloc(sizeof(MIDIINCAPS) * 
@@ -174,6 +174,7 @@ static void pm_winmm_general_inputs()
 
 static void pm_winmm_mapper_input()
 {
+	UINT_PTR dev = MIDIMAPPER;
     WORD wRtn;
     /* Note: if MIDIMAPPER opened as input (documentation implies you
         can, but current system fails to retrieve input mapper
@@ -184,14 +185,14 @@ static void pm_winmm_mapper_input()
                             sizeof(MIDIINCAPS));
     if (wRtn == MMSYSERR_NOERROR) {
         pm_add_device("MMSystem", midi_in_mapper_caps.szPname, TRUE,
-                      (void *) MIDIMAPPER, &pm_winmm_in_dictionary);
+                      (void *) dev, &pm_winmm_in_dictionary);
     }
 }
 
 
 static void pm_winmm_general_outputs()
 {
-    UINT i;
+    UINT_PTR i;
     DWORD wRtn;
     midi_num_outputs = midiOutGetNumDevs();
     midi_out_caps = pm_alloc( sizeof(MIDIOUTCAPS) * midi_num_outputs );
@@ -215,6 +216,8 @@ static void pm_winmm_general_outputs()
 static void pm_winmm_mapper_output()
 {
     WORD wRtn;
+	UINT_PTR dev = MIDIMAPPER;
+
     /* Note: if MIDIMAPPER opened as output (pseudo MIDI device
         maps device independent messages into device dependant ones,
         via NT midimapper program) you still should get some setup info */
@@ -222,7 +225,7 @@ static void pm_winmm_mapper_output()
                              & midi_out_mapper_caps, sizeof(MIDIOUTCAPS));
     if (wRtn == MMSYSERR_NOERROR) {
         pm_add_device("MMSystem", midi_out_mapper_caps.szPname, FALSE,
-                      (void *) MIDIMAPPER, &pm_winmm_out_dictionary);
+                      (void *)dev, &pm_winmm_out_dictionary);
     }
 }
 
@@ -249,7 +252,7 @@ static int str_copy_len(char *dst, char *src, int len)
     strncpy(dst, src, len);
     /* just in case suffex is greater then len, terminate with zero */
     dst[len - 1] = 0;
-    return strlen(dst);
+    return (int)strlen(dst);
 }
 
 
@@ -462,13 +465,13 @@ static PmError allocate_input_buffer(HMIDIIN h, long buffer_len)
 
 static PmError winmm_in_open(PmInternal *midi, void *driverInfo)
 {
-    DWORD dwDevice;
+	UINT_PTR uDeviceID;
     int i = midi->device_id;
     int max_sysex_len = midi->buffer_len * 4;
     int num_input_buffers = max_sysex_len / INPUT_SYSEX_LEN;
     midiwinmm_type m;
 
-    dwDevice = (DWORD) descriptors[i].descriptor;
+	uDeviceID = (UINT_PTR)descriptors[i].descriptor;
 
     /* create system dependent device data */
     m = (midiwinmm_type) pm_alloc(sizeof(midiwinmm_node)); /* create */
@@ -498,7 +501,7 @@ static PmError winmm_in_open(PmInternal *midi, void *driverInfo)
     /* open device */
     pm_hosterror = midiInOpen(
 	    &(m->handle.in),  /* input device handle */
-	    dwDevice,  /* device ID */
+	    (UINT)uDeviceID,  /* device ID */
 	    (DWORD_PTR) winmm_in_callback,  /* callback address */
 	    (DWORD_PTR) midi,  /* callback instance data */
 	    CALLBACK_FUNCTION); /* callback is a procedure */
@@ -732,7 +735,7 @@ static PmTimestamp pm_time_get(midiwinmm_type m)
 
 static PmError winmm_out_open(PmInternal *midi, void *driverInfo)
 {
-    DWORD dwDevice;
+	UINT_PTR uDeviceID;
     int i = midi->device_id;
     midiwinmm_type m;
     MIDIPROPTEMPO propdata;
@@ -740,7 +743,7 @@ static PmError winmm_out_open(PmInternal *midi, void *driverInfo)
     int max_sysex_len = midi->buffer_len * 4;
     int output_buffer_len;
     int num_buffers;
-    dwDevice = (DWORD) descriptors[i].descriptor;
+	uDeviceID = (UINT_PTR) descriptors[i].descriptor;
 
     /* create system dependent device data */
     m = (midiwinmm_type) pm_alloc(sizeof(midiwinmm_node)); /* create */
@@ -773,7 +776,7 @@ static PmError winmm_out_open(PmInternal *midi, void *driverInfo)
         /* use simple midi out calls */
         pm_hosterror = midiOutOpen(
                 (LPHMIDIOUT) & m->handle.out,  /* device Handle */
-		dwDevice,  /* device ID  */
+		(UINT)uDeviceID,  /* device ID  */
 		/* note: same callback fn as for StreamOpen: */
 		(DWORD_PTR) winmm_streamout_callback, /* callback fn */
 		(DWORD_PTR) midi,  /* callback instance data */
@@ -782,7 +785,7 @@ static PmError winmm_out_open(PmInternal *midi, void *driverInfo)
         /* use stream-based midi output (schedulable in future) */
         pm_hosterror = midiStreamOpen(
 	        &m->handle.stream,  /* device Handle */
-		(LPUINT) & dwDevice,  /* device ID pointer */
+		(LPUINT) &uDeviceID,  /* device ID pointer */
 		1,  /* reserved, must be 1 */
 		(DWORD_PTR) winmm_streamout_callback,
 		(DWORD_PTR) midi,  /* callback instance data */

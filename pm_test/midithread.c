@@ -245,8 +245,8 @@ int main()
         exit_with_message("");
     }
     printf("Opening input device %s %s\n", info->interf, info->name);
-    Pm_OpenInput(&midi_in, 
-                 id, 
+    Pm_OpenInput(&midi_in,
+                 id,
                  DRIVER_INFO,
                  INPUT_BUFFER_SIZE,
                  TIME_PROC,
@@ -268,7 +268,7 @@ int main()
         int len;
         fgets(line, STRING_MAX, stdin);
         /* remove the newline: */
-        len = strlen(line);
+        len = (int)strlen(line);
         if (len > 0) line[len - 1] = 0; /* overwrite the newline char */
         if (strcmp(line, "q") == 0) {
             msg = QUIT_MSG;

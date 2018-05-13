@@ -45,7 +45,6 @@ csharp_set_xaml_cs_properties(${PmDefaults_XAML_CS_PROPERTIES})
 set_property(SOURCE App.xaml PROPERTY VS_XAML_TYPE "ApplicationDefinition")
 
 add_executable(${PROJECT_NAME} ${PmDefaults_SOURCE_FILES})
-add_dependencies(${PROJECT_NAME} portmidi-dynamic)
 
 set(REFS "Microsoft.CSharp;PresentationCore;PresentationFramework")
 set(REFS "${REFS};System;System.Core;System.Data;System.Data.DataSetExtensions")

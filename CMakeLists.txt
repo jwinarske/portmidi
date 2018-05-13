@@ -26,7 +26,6 @@ add_subdirectory(pm_java)
 
 if(MSVC)
     add_subdirectory(pm_csharp/pm_defaults)
+else()    
+    add_subdirectory(pm_python/pyportmidi)
 endif(MSVC)
-
-add_subdirectory(pm_python/pyportmidi)
-
