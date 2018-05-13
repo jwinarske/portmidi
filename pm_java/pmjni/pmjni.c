@@ -2,6 +2,7 @@
 #include "porttime.h"
 #include "jportmidi_JPortMidiApi.h"
 #include <stdio.h>
+#include <stdint.h>
 
 // these macros assume JNIEnv *env is declared and valid:
 //
@@ -13,11 +14,11 @@
 // the size of a pointer. Finally cast int to pointer. All this
 // is supposed to avoid C compiler warnings and (worse) losing
 // address bits.
-#define PMSTREAM(obj, fid) ((PmStream *) (long) (*env)->GetLongField(env, obj, fid))
+#define PMSTREAM(obj, fid) ((PmStream *) (uint64_t) (*env)->GetLongField(env, obj, fid))
 // Cast stream to long to convert integer to pointer, then expand
 // integer to 64-bit jlong. This avoids compiler warnings.
 #define SET_PMSTREAM(obj, fid, stream) \
-    (*env)->SetLongField(env, obj, fid, (jlong) (long) stream)
+    (*env)->SetLongField(env, obj, fid, (jlong) (uint64_t) stream)
 
 
 /*
