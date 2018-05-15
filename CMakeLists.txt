@@ -14,6 +14,8 @@ set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "" CACHE INTERNAL "Unused")
 
 PROJECT(portmidi)
 
+include(CTest)
+
 include_directories(pm_common porttime)
 
 add_subdirectory(pm_common)
