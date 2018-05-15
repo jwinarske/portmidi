@@ -13,23 +13,18 @@ set(PmDefaults_SOURCE_FILES
     MainWindow.xaml.cs
 
     Properties/AssemblyInfo.cs
-    Properties/Resources.Designer.cs
-    Properties/Resources.resx
-    Properties/Settings.Designer.cs
-    Properties/Settings.settings
 
     csportmidi/Defines.cs
     csportmidi/CsPortMidi.cs
     csportmidi/CsPortMidiApi.cs
     csportmidi/CsPortMidiException.cs
+
+    pmdefaults.ico
+    portmusic_logo.png
 )
 
 set(PmDefaults_PROPERTIES
     Properties/AssemblyInfo.cs
-    Properties/Resources.Designer.cs
-    Properties/Resources.resx
-    Properties/Settings.Designer.cs
-    Properties/Settings.settings
 )
 
 set(PmDefaults_XAML_CS_PROPERTIES

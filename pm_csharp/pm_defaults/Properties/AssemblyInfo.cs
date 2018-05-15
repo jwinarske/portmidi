@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("PmDefaults")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("PortMusic")]
 [assembly: AssemblyProduct("PmDefaults")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]

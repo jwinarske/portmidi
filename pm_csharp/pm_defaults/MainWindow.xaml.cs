@@ -12,7 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 using csportmidi;
+using System.Text.RegularExpressions;
 
 namespace pmdefaults
 {
@@ -39,15 +41,17 @@ namespace pmdefaults
             outputIds = new List<int?>();
 
             /*
-                        timer = new Timer(50, this); // ms
-                        timer.addActionListener(this);
+            timer = new Timer(50, this); // ms
+            timer.addActionListener(this);
             */
             try
             {
                 jpm = new JPM(this, _inputActivity, this);
                 jpm.setTrace(true);
                 loadDeviceChoices();
-                //				timer.start(); // don't start timer if there's an error
+                 /*
+                timer.start(); // don't start timer if there's an error
+                */
             }
             catch (CsPortMidiException e)
             {
@@ -113,13 +117,13 @@ namespace pmdefaults
         {
             private readonly MainWindow outerInstance;
             internal Brush color;
-//            public readonly Brush OFF_COLOR = Brush.Color.FromRgb(0, 0, 0);
-//            public readonly Brush ON_COLOR = Color.FromRgb(0, 255, 0);
+            //            public readonly Brush OFF_COLOR = Brush.Color.FromRgb(0, 0, 0);
+            //            public readonly Brush ON_COLOR = Color.FromRgb(0, 255, 0);
 
             internal ActivityLight(MainWindow outerInstance) : base()
             {
                 this.outerInstance = outerInstance;
-//                color = OFF_COLOR;
+                //                color = OFF_COLOR;
                 Console.WriteLine("ActivityLight "); // + Size
             }
 
@@ -127,7 +131,7 @@ namespace pmdefaults
             {
                 set
                 {
-//                    color = (value ? ON_COLOR : OFF_COLOR);
+                    //                    color = (value ? ON_COLOR : OFF_COLOR);
                     outerInstance.inputActivity.Fill = color;
                 }
             }
@@ -211,11 +215,13 @@ namespace pmdefaults
                 {
                     inputIds.Add(i);
                     inputSelection.Items.Add(selection);
+                    inputSelection.SelectedIndex = 0;
                 }
                 else
                 {
                     outputIds.Add(i);
                     outputSelection.Items.Add(selection);
+                    outputSelection.SelectedIndex = 0;
                 }
             }
         }
@@ -254,31 +260,43 @@ namespace pmdefaults
 
         public virtual void savePreferences()
         {
-//            Preferences prefs = Preferences.userRoot().node("/PortMidi");
+            const string userRoot = "HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs";
+            const string subkey = "/Port/Midi";
+            const string keyName = userRoot + "\\" + subkey;
+
             int id = outputSelection.SelectedIndex;
             if (id >= 0)
             {
                 string prefName = makePrefName(outputIds[id].Value);
                 Console.WriteLine("PM_RECOMMENDED_OUTPUT_DEVICE: " + prefName);
-//                prefs.put("PM_RECOMMENDED_OUTPUT_DEVICE", prefName);
+                try 
+                {
+                    string key = Regex.Replace("PM_RECOMMENDED_OUTPUT_DEVICE", @"([A-Z])", "/$1");
+                    string value = Regex.Replace(prefName, @"([A-Z])", "/$1");
+                    Registry.SetValue(keyName, key, value, RegistryValueKind.String);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
+
             id = inputSelection.SelectedIndex;
             if (id >= 0)
             {
                 string prefName = makePrefName(inputIds[id].Value);
                 Console.WriteLine("PM_RECOMMENDED_INPUT_DEVICE: " + prefName);
-//                prefs.put("PM_RECOMMENDED_INPUT_DEVICE", prefName);
+                try
+                {
+                    string key = Regex.Replace("PM_RECOMMENDED_INPUT_DEVICE", @"([A-Z])", "/$1");
+                    string value = Regex.Replace(prefName, @"([A-Z])", "/$1");
+                    Registry.SetValue(keyName, key, value, RegistryValueKind.String);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
-/*
-            try
-            {
-                prefs.flush();
-            }
-            catch (BackingStoreException e)
-            {
-                Console.WriteLine(e);
-            }
-*/
         }
 
     }
